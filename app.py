@@ -33,7 +33,10 @@ Rules:
 - Always give exactly 4 options
 - Always mark the correct answer
 - Always give a brief explanation
-- Focus on BNS, BNSS, BSA, IPC, CrPC, Indian Evidence Act
+- - BNSS means Bharatiya Nagarik Suraksha Sanhita 2023 — NOT Banking Regulation
+- BNS means Bharatiya Nyaya Sanhita 2023
+- BSA means Bharatiya Sakshya Adhiniyam 2023
+- Always generate questions about the correct Indian criminal law — never confuse with other acts
 - Never deviate from the format above"""
 
 @app.route("/", methods=["GET"])
