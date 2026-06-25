@@ -7,7 +7,8 @@ app = Flask(__name__)
 
 SYSTEM_PROMPT = """You are an MCQ generator for Indian judicial services exam preparation.
 
-Generate exactly 10 MCQs on the topic the user gives you.
+The user will give you the actual text of a law section and a topic name.
+Generate exactly 10 MCQs based ONLY on the text provided — do not use any outside knowledge.
 
 Follow this format STRICTLY for every question — no exceptions:
 
@@ -19,59 +20,52 @@ D) Option 4
 Answer: A
 Explanation: Brief explanation here
 
-Q2. Question here
-A) Option 1
-B) Option 2
-C) Option 3
-D) Option 4
-Answer: B
-Explanation: Brief explanation here
-
 Rules:
-- Always generate exactly 10 questions
+- Generate exactly 10 questions
+- Base questions ONLY on the text provided
 - Always use Q1 through Q10
 - Always give exactly 4 options
 - Always mark the correct answer
 - Always give a brief explanation
-- - BNSS means Bharatiya Nagarik Suraksha Sanhita 2023 — NOT Banking Regulation
-- BNS means Bharatiya Nyaya Sanhita 2023
-- BSA means Bharatiya Sakshya Adhiniyam 2023
-- Always generate questions about the correct Indian criminal law — never confuse with other acts
 - Never deviate from the format above"""
 
 @app.route("/", methods=["GET"])
 def home():
     return """<!DOCTYPE html><html><head><style>
-    body{background-color:#1a1a2e;color:white;font-family:Arial;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;}
-    .box{background-color:#16213e;padding:40px;border-radius:15px;text-align:center;width:500px;}
+    body{background-color:#1a1a2e;color:white;font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:20px;box-sizing:border-box;}
+    .box{background-color:#16213e;padding:40px;border-radius:15px;text-align:center;width:600px;}
     h1{color:#e94560;}
-    input{width:80%;padding:10px;border-radius:8px;border:none;margin-top:20px;font-size:16px;}
+    input{width:80%;padding:10px;border-radius:8px;border:none;margin-top:15px;font-size:16px;}
+    textarea{width:80%;padding:10px;border-radius:8px;border:none;margin-top:15px;font-size:14px;height:150px;resize:vertical;}
     button{margin-top:15px;padding:10px 30px;background-color:#e94560;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;}
     p{color:#aaa;font-size:14px;}
     </style></head><body><div class="box">
     <h1>⚖️ MCQ Generator</h1>
-    <p>Type any topic from your judicial exam syllabus</p>
+    <p>Paste the actual text of the law section — get 10 accurate MCQs</p>
     <form action="/generate" method="POST">
-    <input type="text" name="topic" placeholder="e.g. Murder under BNS">
-    <br><br>
+    <input type="text" name="topic" placeholder="Topic name — e.g. Section 23 BNSS">
+    <br>
+    <textarea name="lawtext" placeholder="Paste the actual text of the section here..."></textarea>
+    <br>
     <button type="submit">Generate 10 MCQs</button>
     </form></div></body></html>"""
 
 @app.route("/generate", methods=["POST"])
 def generate():
     topic = request.form.get("topic")
+    lawtext = request.form.get("lawtext")
     client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"Generate 10 MCQs on: {topic}"}
+            {"role": "user", "content": f"Topic: {topic}\n\nLaw Text:\n{lawtext}\n\nGenerate 10 MCQs based only on this text."}
         ]
     )
     raw = response.choices[0].message.content
     questions = re.split(r'Q\d+\.', raw)
     questions = [q.strip() for q in questions if q.strip()]
-    
+
     cards_html = ""
     for i, q in enumerate(questions):
         lines = q.strip().split("\n")
@@ -83,7 +77,7 @@ def generate():
             <p class='qtext'>{question_text}</p>
             <p class='options'>{rest}</p>
         </div>"""
-    
+
     return f"""<!DOCTYPE html><html><head><style>
     body{{background-color:#1a1a2e;color:white;font-family:Arial;margin:0;padding:20px;}}
     h1{{color:#e94560;text-align:center;}}
