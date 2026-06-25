@@ -62,7 +62,7 @@ def generate():
     topic = request.form.get("topic")
     client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": f"Generate 10 MCQs on: {topic}"}
