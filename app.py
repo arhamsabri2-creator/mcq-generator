@@ -132,8 +132,6 @@ h2{{color:#f78166;}}
 {"<a class='next-btn' href='/question'>Next Question →</a>" if next_num < total else "<a class='next-btn' href='/score'>See Final Score →</a>"}
 </div></body></html>"""
     current = session["current"]
-    session["current"] += 1
-    session.modified = True
     if current >= session["total"]:
         return redirect(url_for("score"))
     q = session["questions"][current]
