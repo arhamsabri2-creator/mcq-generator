@@ -88,7 +88,7 @@ def generate():
     session["score"] = 0
     session["total"] = len(questions)
     return redirect(url_for("question"))
-    @app.route("/question", methods=["GET", "POST"])
+@app.route("/question", methods=["GET", "POST"])
 def question():
     if "questions" not in session:
         return redirect(url_for("home"))
