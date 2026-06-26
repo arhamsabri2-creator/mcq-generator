@@ -42,12 +42,7 @@ def parse_questions(raw):
                 answer = line.replace("Answer:", "").strip()
             elif line.startswith("Explanation:"):
                 explanation = line.replace("Explanation:", "").strip()
-        parsed.append({
-            "question": question_text,
-            "options": options,
-            "answer": answer,
-            "explanation": explanation
-        })
+        parsed.append({"question": question_text, "options": options, "answer": answer, "explanation": explanation})
     return parsed
 
 @app.route("/", methods=["GET"])
@@ -93,8 +88,7 @@ def generate():
     session["score"] = 0
     session["total"] = len(questions)
     return redirect(url_for("question"))
-
-@app.route("/question", methods=["GET", "POST"])
+    @app.route("/question", methods=["GET", "POST"])
 def question():
     if "questions" not in session:
         return redirect(url_for("home"))
@@ -106,11 +100,12 @@ def question():
         is_correct = selected == correct
         if is_correct:
             session["score"] += 1
+        session["current"] += 1
         session.modified = True
+        next_num = session["current"]
+        total = session["total"]
         feedback_color = "#238636" if is_correct else "#da3633"
         feedback_text = "✅ Correct!" if is_correct else f"❌ Wrong! Correct answer: {correct}"
-        next_num = current + 1
-        total = session["total"]
         options_html = ""
         for opt in q["options"]:
             letter = opt[0]
